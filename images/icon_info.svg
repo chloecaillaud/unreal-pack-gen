@@ -1,0 +1,11 @@
+<svg id="info" xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #0072bc;
+        fill-rule: evenodd;
+      }
+    </style>
+  </defs>
+  <path id="circleBG" class="cls-1" d="M256,0C397.385,0,512,114.615,512,256S397.385,512,256,512,0,397.385,0,256,114.615,0,256,0ZM218.5,200h75V425h-75V200ZM256,80a37.5,37.5,0,1,1-37.5,37.5A37.5,37.5,0,0,1,256,80Z"/>
+</svg>

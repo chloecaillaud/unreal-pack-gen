@@ -1,0 +1,22 @@
+{
+  "ContentSettings": {
+    "Config": {
+      "configFile": "config.ini"
+    },
+    "Media": {
+      "thumbnailFile": "{PACKNAME}{EXT}",
+      "screenshotFile": "{PACKNAME}_Preview{EXT}"
+    },
+    "manifestFile": "manifest.json"
+  },
+  "ZipContent": {
+    "FeaturePacks": {
+      "upackFile": "{PACKNAME}.upack"
+    },
+    "Samples": {
+      "assetFolder": "./{PACKNAME}/Content/{BASENAME}"
+    }
+  },
+  "responseFile": "ContentToPack.txt",
+  "packingCmdFile": "generatePack.bat"
+}

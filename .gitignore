@@ -1,0 +1,10 @@
+#python
+__pycache__/
+
+#editor files
+.vscode/
+*.code-workspace
+
+#logs
+*.log
+*profile
