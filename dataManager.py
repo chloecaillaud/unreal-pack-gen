@@ -57,12 +57,12 @@ class DataManager():
 			'packName':        None,
 			'packCleanName':   None,
 			'packVersion':     None,
-			'packDesc':        None,
+			'packDesc':        '', # optional
 			'packCategory':    None,
-			'packTags':        None,
+			'packTags':        '', # optional
 			'packAssetsPath':  None,
-			'packThumbPath':   None,
-			'packScrShotPath': None,
+			'packThumbPath':   '', # optional
+			'packScrShotPath': '', # optional
 			'packOutputPath':  None,
 			'packAssetTypes':  set(),
 		}
@@ -117,13 +117,13 @@ class DataManager():
 			if os.path.exists(tumbnailPath):
 				self.packInfo['packThumbPath'] = tumbnailPath
 			else:
-				self.packInfo['packThumbPath'] = None
+				self.packInfo['packThumbPath'] = ''
 
 		if screenshotPath != None and isinstance(screenshotPath, str):
 			if os.path.exists(screenshotPath):
 				self.packInfo['packScrShotPath'] = screenshotPath
 			else:
-				self.packInfo['packScrShotPath'] = None
+				self.packInfo['packScrShotPath'] = ''
 
 		if outputPath and isinstance(outputPath, str):
 			if os.path.exists(outputPath):
@@ -139,7 +139,9 @@ class DataManager():
 			return None
 		
 		# return array of all keys with None values
-		return [key for key, value in self.packInfo.items() if value == None]
+		missingInfo = [key for key, value in self.packInfo.items() if value == None]
+
+		return missingInfo
 
 #-
 	def addAssetTypes(self, types: Sequence[str]) -> None:
@@ -350,9 +352,17 @@ class DataManager():
 					newPath = os.path.join(self.tmpFilePaths[key][0], self.getFilenameFromPattern(key, self.tmpFilePaths[key][1], self.packInfo['packAssetsPath']))
 					self.tmpFilePaths[key] = (os.path.normpath(newPath), '')
 				case 'thumbnailFile':
-					self.tmpFilePaths[key] = (self.tmpFilePaths[key][0], self.getFilenameFromPattern(key, self.tmpFilePaths[key][1], self.packInfo['packThumbPath']))
+					if self.packInfo['packThumbPath']:
+						self.tmpFilePaths[key] = (self.tmpFilePaths[key][0], self.getFilenameFromPattern(key, self.tmpFilePaths[key][1], self.packInfo['packThumbPath']))
+					else:
+						# set to empty str if not provided
+						self.tmpFilePaths[key] = (self.tmpFilePaths[key][0], '')
 				case 'screenshotFile':
-					self.tmpFilePaths[key] = (self.tmpFilePaths[key][0], self.getFilenameFromPattern(key, self.tmpFilePaths[key][1], self.packInfo['packScrShotPath']))
+					if self.packInfo['packScrShotPath']:
+						self.tmpFilePaths[key] = (self.tmpFilePaths[key][0], self.getFilenameFromPattern(key, self.tmpFilePaths[key][1], self.packInfo['packScrShotPath']))
+					else:
+						# set to empty str if not provided
+						self.tmpFilePaths[key] = (self.tmpFilePaths[key][0], '')
 				# default
 				case _:
 					self.tmpFilePaths[key] = (self.tmpFilePaths[key][0], self.getFilenameFromPattern(key, self.tmpFilePaths[key][1], None))
@@ -393,8 +403,11 @@ class DataManager():
 			file.write(self.packingCmdData)
 
 		# thumbnailFile / screenshotFile
-		copy2(self.packInfo['packThumbPath']   or self.defaultImgPath, os.path.join(self.tmpFilePaths['thumbnailFile'][0] , self.tmpFilePaths['thumbnailFile'][1]))
-		copy2(self.packInfo['packScrShotPath'] or self.defaultImgPath, os.path.join(self.tmpFilePaths['screenshotFile'][0], self.tmpFilePaths['screenshotFile'][1]))
+		# do not copy if not provided
+		if self.packInfo['packThumbPath']:
+			copy2(self.packInfo['packThumbPath'], os.path.join(self.tmpFilePaths['thumbnailFile'][0] , self.tmpFilePaths['thumbnailFile'][1]))
+		if self.packInfo['packScrShotPath']:
+			copy2(self.packInfo['packScrShotPath'], os.path.join(self.tmpFilePaths['screenshotFile'][0], self.tmpFilePaths['screenshotFile'][1]))
 		
 		# assetFolder
 		copytree(self.packInfo['packAssetsPath'], self.tmpFilePaths['assetFolder'][0], dirs_exist_ok=True)
