@@ -2,7 +2,6 @@ from dataManager import DataManager
 from customComponents import *
 from PIL import Image
 import customtkinter
-import json
 import os
 import gc
 
@@ -32,12 +31,12 @@ class App(customtkinter.CTk):
 			,os.path.join(CURRENT_FILE_DIR, './settings/packAdditions/')
 			,unrealPakPath
 			)
-		
+
 		# define default dim
 		self.defaultDim = '600x800'
 		self.geometry(self.defaultDim)
 		self.resizable(True, True)
-		
+
 		# set info
 		self.title('unreal pack gen')
 
@@ -469,7 +468,8 @@ class App(customtkinter.CTk):
 		self.displayPending()
 		self.dataManager.generateFileData()
 		self.dataManager.createPack(zipped, unpacked, installToEngine)
-		self.pollDataManagerJobsLoop()
+
+		self.after(100, self.pollDataManagerJobsLoop)
 
 #-
 	def pollDataManagerJobsLoop(self) -> None:
