@@ -39,7 +39,7 @@ class App(customtkinter.CTk):
 		self.resizable(True, True)
 		
 		# set info
-		self.title('unreal pack generator')
+		self.title('unreal pack gen')
 
 		# initalize all other vars
 		self.currentMainFrame = None
