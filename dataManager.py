@@ -3,6 +3,7 @@ from tempfile import TemporaryDirectory
 from shutil import copy2, copytree
 from sys import stdout as sysStdout
 from io import StringIO
+from PIL import Image
 import subprocess
 import platform
 import winreg
@@ -403,11 +404,13 @@ class DataManager():
 			file.write(self.packingCmdData)
 
 		# thumbnailFile / screenshotFile
-		# do not copy if not provided
+		# resize to proper size and write to dest. does not write if image not provided
 		if self.packInfo['packThumbPath']:
-			copy2(self.packInfo['packThumbPath'], os.path.join(self.tmpFilePaths['thumbnailFile'][0] , self.tmpFilePaths['thumbnailFile'][1]))
+			with Image.open(self.packInfo['packThumbPath']) as originalImage:
+				self.cropAndResizeImage(originalImage, (64, 64)).save(os.path.join(self.tmpFilePaths['thumbnailFile'][0] , self.tmpFilePaths['thumbnailFile'][1]))
 		if self.packInfo['packScrShotPath']:
-			copy2(self.packInfo['packScrShotPath'], os.path.join(self.tmpFilePaths['screenshotFile'][0], self.tmpFilePaths['screenshotFile'][1]))
+			with Image.open(self.packInfo['packScrShotPath']) as originalImage:
+				self.cropAndResizeImage(originalImage, (400, 200)).save(os.path.join(self.tmpFilePaths['screenshotFile'][0] , self.tmpFilePaths['screenshotFile'][1]))
 		
 		# assetFolder
 		copytree(self.packInfo['packAssetsPath'], self.tmpFilePaths['assetFolder'][0], dirs_exist_ok=True)
@@ -689,6 +692,25 @@ class DataManager():
 								self.packerPath = os.path.abspath(os.path.join(valueData, PackerRelPath))
 								return True
 		return False
+
+#-
+	@classmethod
+	def cropAndResizeImage(cls, image: Image.Image, targetSize: tuple[int, int]) -> Image.Image:
+		if (targetSize[0] / targetSize[1]) <= (image.width / image.height):
+			cropHeight = image.height
+			cropWidth  = image.height * (targetSize[0] / targetSize[1])
+		else:
+			cropHeight = image.width * (targetSize[1] / targetSize[0])
+			cropWidth  = image.width
+
+		cropBbox = (
+			(image.width *0.5) - (cropWidth *0.5),
+			(image.height*0.5) - (cropHeight*0.5),
+			(image.width *0.5) - (cropWidth *0.5) + cropWidth,
+			(image.height*0.5) - (cropHeight*0.5) + cropHeight,
+			)
+
+		return image.resize(targetSize, Image.BICUBIC, cropBbox)
 
 #-
 	@classmethod

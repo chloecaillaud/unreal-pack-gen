@@ -1,5 +1,6 @@
 from PIL import Image, ImageTk
 from math import isclose
+from dataManager import DataManager
 import customtkinter
 import os
 
@@ -87,7 +88,7 @@ class ImageFilePickerComponent(CTkFrame):
 			self.button.configure(True, **buttonTheme)
 
 		# undelying image data
-		self.imageData = self._getCropResizedImageData(Image.open(self.resultVar.get() or os.path.join(CURRENT_FILE_DIR, './images/defaultImage.png')))
+		self.imageData = DataManager.cropAndResizeImage(Image.open(self.resultVar.get() or os.path.join(CURRENT_FILE_DIR, './images/defaultImage.png')), self.imageSize)
 		self.image = ImageTk.PhotoImage(self.imageData, width=self.imageSize[0], height=self.imageSize[1])
 		self.scaleFac = 1
 
@@ -116,7 +117,7 @@ class ImageFilePickerComponent(CTkFrame):
 		# update with results
 		self.resultVar.set(dialogResult)
 
-		self.imageData = self._getCropResizedImageData(Image.open(dialogResult or os.path.join(CURRENT_FILE_DIR, './images/defaultImage.png')))
+		self.imageData = DataManager.cropAndResizeImage(Image.open(dialogResult or os.path.join(CURRENT_FILE_DIR, './images/defaultImage.png')), self.imageSize)
 		self.image = ImageTk.PhotoImage(self.imageData.resize((int(self.imageSize[0] * self.scaleFac), int(self.imageSize[1] * self.scaleFac))))
 		self.imageCanvas.itemconfigure(self.imageID, image=self.image)
 
